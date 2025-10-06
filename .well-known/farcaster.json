@@ -1,0 +1,14 @@
+```json
+{
+"miniapp": {
+"version": "1",
+"name": "MikroGorev",
+"iconUrl": "https://your-domain.example/assets/logo-200.png",
+"homeUrl": "https://your-domain.example/",
+"imageUrl": "https://your-domain.example/assets/opengraph-3x2.png",
+"buttonTitle": "Join",
+"splashImageUrl": "https://your-domain.example/assets/splash-200.png",
+"splashBackgroundColor": "#0b1020",
+"webhookUrl": "https://your-domain.example/api/webhook"
+}
+}
