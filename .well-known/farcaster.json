@@ -1,8 +1,17 @@
 {
-  "name": "MicroQuest",
-  "description": "Complete small creative quests on Farcaster and earn rewards.",
-  "url": "https://microquest.vercel.app",
-  "icon": "https://microquest.vercel.app/icon.png",
-  "buttonTitle": "Join Quest",
-  "themeColor": "#6C5CE7"
+  "miniapp": {
+    "version": "1",
+    "name": "MicroQuest",
+    "iconUrl": "https://micro-quest.vercel.app/icon.png",
+    "homeUrl": "https://micro-quest.vercel.app/",
+    "imageUrl": "https://micro-quest.vercel.app/opengraph-3x2.png",
+    "buttonTitle": "Join Quest",
+    "splashImageUrl": "https://micro-quest.vercel.app/splash-200.png",
+    "splashBackgroundColor": "#6C5CE7"
+  },
+  "accountAssociation": {
+    "protected": "",
+    "payload": "",
+    "signature": ""
+  }
 }
