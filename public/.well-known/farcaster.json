@@ -2,11 +2,11 @@
   "miniapp": {
     "version": "1",
     "name": "MicroQuest",
-    "iconUrl": "https://micro-quest.vercel.app/icon.png",
+    "iconUrl": "https://micro-quest.vercel.app/icon.svg",
     "homeUrl": "https://micro-quest.vercel.app/",
-    "imageUrl": "https://micro-quest.vercel.app/opengraph-3x2.png",
+    "imageUrl": "https://micro-quest.vercel.app/opengraph-3x2.svg",
     "buttonTitle": "Join Quest",
-    "splashImageUrl": "https://micro-quest.vercel.app/splash-200.png",
+    "splashImageUrl": "https://micro-quest.vercel.app/splash-200.svg",
     "splashBackgroundColor": "#6C5CE7",
     "webhookUrl": "https://micro-quest.vercel.app/api/reward"
   },
