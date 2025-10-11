@@ -1,12 +1,15 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 512 512">
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="800" viewBox="0 0 1200 800">
   <defs>
-    <linearGradient id="g-icon" x1="0" x2="1">
+    <linearGradient id="g-opengraph" x1="0" x2="1">
       <stop offset="0" stop-color="#6c5ce7"/>
       <stop offset="1" stop-color="#a29bfe"/>
     </linearGradient>
   </defs>
-  <rect width="100%" height="100%" rx="64" fill="url(#g-icon)"/>
-  <text x="50%" y="54%" text-anchor="middle" fill="#fff" font-family="Arial, sans-serif" font-weight="700" font-size="200">Q</text>
+  <rect width="1200" height="800" fill="url(#g-opengraph)"/>
+  <g font-family="Arial, sans-serif" text-anchor="middle" fill="#fff">
+    <text x="50%" y="45%" font-size="64" font-weight="700">MicroQuest</text>
+    <text x="50%" y="58%" font-size="24">Daily micro-challenges on Farcaster</text>
+  </g>
 </svg>
 
 
