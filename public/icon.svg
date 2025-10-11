@@ -1,11 +1,6 @@
-<!-- save as public/icon.svg (or export to icon.png 512x512) -->
 <svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
-  <defs>
-    <linearGradient id="g" x1="0" x2="1">
-      <stop offset="0" stop-color="#6c5ce7"/>
-      <stop offset="1" stop-color="#a29bfe"/>
-    </linearGradient>
-  </defs>
+  <defs><linearGradient id="g" x1="0" x2="1"><stop offset="0" stop-color="#6c5ce7"/><stop offset="1" stop-color="#a29bfe"/></linearGradient></defs>
   <rect width="100%" height="100%" rx="64" fill="url(#g)"/>
   <text x="50%" y="54%" text-anchor="middle" fill="#fff" font-family="Inter, Arial, sans-serif" font-weight="700" font-size="200">Q</text>
 </svg>
+
