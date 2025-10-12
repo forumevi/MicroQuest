@@ -1,45 +1,68 @@
 // src/lib/sdkShim.js
-// Lightweight shim: use host-injected SDK if available; otherwise provide safe no-ops.
-// This prevents build errors when the official @farcaster/miniapp-sdk package is not installed.
+// Robust shim that tries many global names and logs what's available.
+// Safe: only reads window and logs.
 
 const noopAsync = async () => {};
+
+function safeLog(...args) {
+  try { console.log(...args); } catch (e) {}
+}
+
+function findHostSdk() {
+  if (typeof window === 'undefined') return null;
+  safeLog('sdkShim: scanning window for host SDK globals...');
+  const common = ['sdk','__FARCASTER_SDK__','farcasterMiniApp','FarcasterMiniApp','FarcasterSDK','miniAppSdk'];
+  for (const k of common) {
+    try {
+      if (window[k] && typeof window[k] === 'object') {
+        safeLog('sdkShim: found candidate:', k);
+        return window[k];
+      }
+    } catch(e){}
+  }
+  // Heuristic: find any object with actions.composeCast
+  try {
+    for (const key of Object.keys(window).slice(0,200)) {
+      try {
+        const val = window[key];
+        if (val && typeof val === 'object' && val.actions && typeof val.actions.composeCast === 'function') {
+          safeLog('sdkShim: heuristics found sdk at window.'+key);
+          return val;
+        }
+      } catch(e){}
+    }
+  } catch(e){}
+  safeLog('sdkShim: no host SDK found, using fallback shim');
+  return null;
+}
+
+const host = findHostSdk();
 
 const fallback = {
   actions: {
     ready: noopAsync,
     signin: noopAsync,
     composeCast: async (payload) => {
-      // Fallback UX when running outside the Farcaster host.
-      if (typeof window !== "undefined") {
-        // eslint-disable-next-line no-alert
-        alert(
-          "Compose is not available outside the Farcaster client. Your draft:\n\n" +
-            (payload?.text || "")
-        );
+      // Friendly UI fallback: use an alert so user sees something outside Farcaster
+      if (typeof window !== 'undefined') {
+        try {
+          // create simple modal if possible
+          const msg = "Compose unavailable in this environment. Draft:\n\n" + (payload?.text || '');
+          alert(msg);
+        } catch(e){
+          console.log('composeCast fallback:', payload);
+        }
       }
       return null;
     },
-    addMiniApp: noopAsync,
-    sendToken: noopAsync,
+    addMiniApp: noopAsync
   },
   wallet: {
-    getEthereumProvider: () => null,
+    getEthereumProvider: () => null
   },
-  context: {},
+  context: {}
 };
 
-function getHostSdk() {
-  if (typeof window === "undefined") return null;
-  // Try common global names that a host might expose.
-  if (window.sdk && typeof window.sdk === "object") return window.sdk;
-  if (window.__FARCASTER_SDK__ && typeof window.__FARCASTER_SDK__ === "object")
-    return window.__FARCASTER_SDK__;
-  if (window.farcasterMiniApp && typeof window.farcasterMiniApp === "object")
-    return window.farcasterMiniApp;
-  return null;
-}
-
-const hostSdk = getHostSdk();
-const sdk = hostSdk || fallback;
-
+const sdk = host || fallback;
+safeLog('sdkShim: final sdk used ->', !!host ? 'host' : 'fallback', host || {});
 export default sdk;
