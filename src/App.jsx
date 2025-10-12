@@ -1,68 +1,69 @@
 // src/App.jsx
-import { useEffect, useState } from "react";
-import sdk from "./lib/sdkShim"; // use the shim instead of a missing npm package
+import React, { useEffect, useState } from 'react';
+import sdk from './lib/sdkShim';
 
 export default function App() {
-  const [quest, setQuest] = useState(
-    "Share your favorite decentralized tool!"
-  );
-  const [status, setStatus] = useState("ready");
+  const [status, setStatus] = useState('loading');
+  const [logs, setLogs] = useState([]);
+
+  function addLog(l){ setLogs(prev => [...prev, (new Date()).toISOString() + ' — ' + l]); }
 
   useEffect(() => {
-    // Call ready() if available on the host SDK (no-op in fallback)
     (async () => {
       try {
-        if (sdk && sdk.actions && typeof sdk.actions.ready === "function") {
+        console.log('App: sdk object:', sdk);
+        addLog('App: sdk object present? ' + !!sdk);
+        if (sdk && sdk.actions && typeof sdk.actions.ready === 'function') {
+          addLog('App: calling sdk.actions.ready()');
           await sdk.actions.ready();
+          addLog('App: sdk.actions.ready() resolved');
+        } else {
+          addLog('App: sdk.actions.ready not available (web fallback)');
         }
-        setStatus("ready");
+        setStatus('ready');
       } catch (err) {
-        console.warn("SDK ready failed", err);
-        setStatus("error");
+        console.error('App ready error', err);
+        addLog('App ready error: ' + (err && err.message));
+        setStatus('error');
       }
     })();
   }, []);
 
   const handleJoinQuest = async () => {
     try {
-      if (sdk && sdk.actions && typeof sdk.actions.composeCast === "function") {
-        await sdk.actions.composeCast({
-          text: `🧩 Completing today's MicroQuest: ${quest}`,
-        });
+      addLog('Join clicked – calling composeCast if available');
+      if (sdk && sdk.actions && typeof sdk.actions.composeCast === 'function') {
+        await sdk.actions.composeCast({ text: `I joined MicroQuest!` });
+        addLog('composeCast called');
       } else {
-        // fallback: the shim will alert the user outside host
-        await sdk.actions.composeCast({ text: quest });
+        addLog('composeCast not available — fallback alert');
+        await sdk.actions.composeCast({ text: `I joined MicroQuest!` });
       }
-    } catch (err) {
-      console.error("composeCast failed", err);
-      // Friendly UX fallback
-      if (typeof window !== "undefined") {
-        // eslint-disable-next-line no-alert
-        alert("Failed to submit. Are you inside the Farcaster client?");
-      }
+    } catch (e) {
+      console.error('composeCast failed', e);
+      addLog('composeCast failed: ' + (e && e.message));
+      alert('Submission failed. If you are in Farcaster client, try again.');
     }
   };
 
   return (
-    <div className="app">
-      <div className="card">
+    <div style={{fontFamily:'Inter, Arial, sans-serif',padding:20}}>
+      <header>
         <h1>MicroQuest</h1>
-        <p className="subtitle">Complete today’s quest and earn your reward!</p>
+        <div>Status: {status}</div>
+      </header>
 
-        <div className="quest-box">
-          <p className="quest-text">🎯 {quest}</p>
-        </div>
+      <main>
+        <p>Complete quick quests on Farcaster.</p>
+        <button onClick={handleJoinQuest} style={{padding:'10px 18px', borderRadius:8}}>Join Quest</button>
 
-        <div style={{ display: "flex", gap: 8, justifyContent: "center" }}>
-          <button className="btn" onClick={handleJoinQuest}>
-            Join Quest
-          </button>
-        </div>
-
-        <div style={{ marginTop: 12, fontSize: 12, opacity: 0.85 }}>
-          SDK status: {status}
-        </div>
-      </div>
+        <section style={{marginTop:20}}>
+          <h3>Debug logs (latest)</h3>
+          <div style={{maxHeight:200, overflow:'auto', background:'#f7f7f7', padding:10}}>
+            {logs.length === 0 ? <i>No logs yet</i> : logs.slice().reverse().map((l,i)=>(<div key={i} style={{fontSize:12}}>{l}</div>))}
+          </div>
+        </section>
+      </main>
     </div>
   );
 }
