@@ -6,9 +6,13 @@
     "homeUrl": "https://micro-quest.vercel.app/",
     "imageUrl": "https://micro-quest.vercel.app/opengraph-3x2.svg",
     "buttonTitle": "Join Quest",
-   "splashImageUrl": "https://micro-quest.vercel.app/transparent.svg",
+    "splashImageUrl": "https://micro-quest.vercel.app/transparent.svg",
     "splashBackgroundColor": "#6C5CE7",
-    "webhookUrl": "https://micro-quest.vercel.app/api/reward"
+    "webhookUrl": "https://micro-quest.vercel.app/api/reward",
+    "frame": {
+      "version": "1",
+      "readyEvent": "MICROQUEST_READY"
+    }
   },
   "accountAssociation": {
     "header": "eyJmaWQiOjUyMDE2OCwidHlwZSI6ImF1dGgiLCJrZXkiOiIweDI3N2ZjMTRmNjkwNjA2RWMzMUYwMDYyMDI0NjRFQTU2M2VmRkU2QzIifQ",
