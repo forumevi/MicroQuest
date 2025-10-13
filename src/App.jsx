@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { MiniAppSDK } from "@farcaster/miniapp-sdk";
+import { MiniAppSDK } from "./lib/farcaster-sdk";
 import "./index.css";
 
 function App() {
