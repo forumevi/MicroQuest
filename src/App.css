@@ -1,0 +1,25 @@
+.app {
+  text-align: center;
+  font-family: system-ui, sans-serif;
+  padding: 40px;
+}
+
+.logo {
+  width: 120px;
+  margin-bottom: 16px;
+}
+
+button {
+  background: #6c5ce7;
+  border: none;
+  color: white;
+  font-size: 16px;
+  padding: 12px 24px;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: opacity 0.2s ease-in-out;
+}
+
+button:hover {
+  opacity: 0.85;
+}
