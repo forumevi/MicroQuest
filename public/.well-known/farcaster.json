@@ -6,7 +6,7 @@
     "homeUrl": "https://micro-quest.vercel.app/",
     "imageUrl": "https://micro-quest.vercel.app/opengraph-3x2.svg",
     "buttonTitle": "Join Quest",
-    "splashImageUrl": "https://micro-quest.vercel.app/splash-200.svg",
+   "splashImageUrl": "https://micro-quest.vercel.app/transparent.svg",
     "splashBackgroundColor": "#6C5CE7",
     "webhookUrl": "https://micro-quest.vercel.app/api/reward"
   },
