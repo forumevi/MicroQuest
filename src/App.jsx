@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { sdk } from './lib/sdkShim'; // Dummy SDK import
+import { sdk } from './lib/sdkShim'; // Dummy SDK
 
 export default function App() {
   const [status, setStatus] = useState('loading');
@@ -13,14 +13,12 @@ export default function App() {
       try {
         addLog('Initializing Farcaster ready flow...');
 
-        // SDK üzerinden ready çağrısı
         if (sdk?.actions?.ready) {
           await sdk.actions.ready();
           addLog('ready() called via sdkShim');
           if (!cancelled) setStatus('ready');
         }
 
-        // Cross-origin fallback: postMessage
         if (typeof window.parent !== 'undefined' && window.parent !== window) {
           window.parent.postMessage({ type: 'MICROQUEST_READY' }, '*');
           addLog('ready() sent via postMessage to host');
@@ -32,7 +30,6 @@ export default function App() {
       }
     };
 
-    // Early-ready marker
     if (!window.__MICROQUEST_EARLY_READY_FIRED__) {
       window.__MICROQUEST_EARLY_READY_FIRED__ = true;
       addLog('early-ready marker set');
