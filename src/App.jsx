@@ -1,39 +1,57 @@
-import { useEffect } from "react";
-import "./App.css";
+import { useEffect, useState } from "react";
+import { MiniAppSDK } from "@farcaster/miniapp-sdk";
+import "./index.css";
 
 function App() {
-  useEffect(() => {
-    console.log("MicroQuest starting…");
+  const [status, setStatus] = useState("loading...");
+  const [isReady, setIsReady] = useState(false);
 
-    // Farcaster SDK global objesini bekle
-    const interval = setInterval(() => {
-      if (window.Farcaster && window.Farcaster.ready) {
-        clearInterval(interval);
-        console.log("SDK found, calling ready()");
-        window.Farcaster.ready({ event: "MICROQUEST_READY" });
+  useEffect(() => {
+    const init = async () => {
+      console.log("🚀 Starting MicroQuest init...");
+      setStatus("Initializing SDK...");
+
+      try {
+        const sdk = new MiniAppSDK();
+        console.log("startup: calling ready() on SDK");
+        await sdk.ready();
+        console.log("sdk.ready() resolved");
+        setIsReady(true);
+        setStatus("ready");
+      } catch (err) {
+        console.error("SDK init error:", err);
+        setStatus("error");
       }
-    }, 200);
+    };
+
+    init();
   }, []);
 
-  const handleJoin = async () => {
+  const handleJoinQuest = () => {
     console.log("Join clicked");
-    try {
-      await window.Farcaster.composeCast({
-        text: "I'm joining MicroQuest! 🚀",
-        embeds: ["https://micro-quest.vercel.app"],
-      });
+    setStatus("joining quest...");
+    // örnek cast veya işlem
+    setTimeout(() => {
       console.log("composeCast returned");
-    } catch (err) {
-      console.error("composeCast failed", err);
-    }
+      setStatus("Quest joined ✅");
+    }, 1000);
   };
+
+  if (!isReady) {
+    return (
+      <div className="splash">
+        <img src="/splash.png" alt="Splash" />
+        <p className="status">Status: {status}</p>
+      </div>
+    );
+  }
 
   return (
     <div className="app">
-      <img src="/icon.svg" alt="icon" className="logo" />
       <h1>MicroQuest</h1>
       <p>Complete quick micro-challenges on Farcaster.</p>
-      <button onClick={handleJoin}>Join Quest</button>
+      <button onClick={handleJoinQuest}>Join Quest</button>
+      <p className="status">Status: {status}</p>
     </div>
   );
 }
