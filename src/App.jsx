@@ -1,59 +1,57 @@
-import { useEffect, useState } from "react";
-import { MiniAppSDK } from "./lib/farcaster-sdk";
-import "./index.css";
+import React, { useEffect } from "react";
 
-function App() {
-  const [status, setStatus] = useState("loading...");
-  const [isReady, setIsReady] = useState(false);
+let sdk;
+try {
+  sdk = await import("@farcaster/miniapp-sdk");
+  console.log("Farcaster SDK loaded");
+} catch (err) {
+  console.warn("Farcaster SDK not found, using mockSDK");
+  const { mockSDK } = await import("./lib/mockSDK.js");
+  sdk = mockSDK;
+}
 
+export default function App() {
   useEffect(() => {
-    const init = async () => {
-      console.log("🚀 Starting MicroQuest init...");
-      setStatus("Initializing SDK...");
-
-      try {
-        const sdk = new MiniAppSDK();
-        console.log("startup: calling ready() on SDK");
-        await sdk.ready();
-        console.log("sdk.ready() resolved");
-        setIsReady(true);
-        setStatus("ready");
-      } catch (err) {
-        console.error("SDK init error:", err);
-        setStatus("error");
-      }
-    };
-
-    init();
+    console.log("startup: calling ready() on SDK");
+    sdk.ready().then(() => {
+      console.log("sdk.ready() resolved");
+    });
   }, []);
 
-  const handleJoinQuest = () => {
+  const handleJoin = () => {
     console.log("Join clicked");
-    setStatus("joining quest...");
-    // örnek cast veya işlem
-    setTimeout(() => {
-      console.log("composeCast returned");
-      setStatus("Quest joined ✅");
-    }, 1000);
+    sdk.composeCast({
+      text: "🚀 I joined MicroQuest!",
+    });
   };
 
-  if (!isReady) {
-    return (
-      <div className="splash">
-        <img src="/splash.png" alt="Splash" />
-        <p className="status">Status: {status}</p>
-      </div>
-    );
-  }
-
   return (
-    <div className="app">
+    <div
+      style={{
+        height: "100vh",
+        backgroundColor: "#6C5CE7",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        flexDirection: "column",
+        color: "white",
+      }}
+    >
       <h1>MicroQuest</h1>
-      <p>Complete quick micro-challenges on Farcaster.</p>
-      <button onClick={handleJoinQuest}>Join Quest</button>
-      <p className="status">Status: {status}</p>
+      <button
+        onClick={handleJoin}
+        style={{
+          background: "white",
+          color: "#6C5CE7",
+          padding: "12px 20px",
+          borderRadius: "10px",
+          border: "none",
+          fontWeight: "bold",
+          cursor: "pointer",
+        }}
+      >
+        Join Quest
+      </button>
     </div>
   );
 }
-
-export default App;
