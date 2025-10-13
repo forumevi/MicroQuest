@@ -10,7 +10,7 @@ export default function App() {
     let cancelled = false;
 
     (async () => {
-      addLog('startup: calling ready() on Farcaster SDK');
+      addLog('startup: calling ready() on SDK');
       try {
         if (sdk && typeof sdk.ready === 'function') {
           await sdk.ready();
