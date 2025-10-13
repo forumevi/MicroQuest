@@ -2,7 +2,7 @@
   "name": "microquest-miniapp",
   "version": "0.1.0",
   "private": true,
-  "type": "module",      // <--- Eklendi
+  "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
