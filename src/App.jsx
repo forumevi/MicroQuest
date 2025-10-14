@@ -8,16 +8,28 @@ export default function App() {
   useEffect(() => {
     let mounted = true;
 
-    async function loadSdk() {
+    async function loadSdkSafely() {
       setLoadingSdk(true);
+
+      // Bu isim runtime'da oluşturuluyor — Vite/Rollup build-time çözümlemeye çalışmaz.
+      const pkgName = '@farcaster/miniapp-sdk';
+
+      // import(/* @vite-ignore */ pkgName) — Vite'e "bu import'u çözme" der.
       try {
-        // dynamic import -> build sırasında paket yoksa hatayı yakalar
-        const mod = await import('@farcaster/miniapp-sdk');
+        if (typeof window === 'undefined') {
+          // SSR/build ortamı: SDK'yi deneme
+          throw new Error('Not running in browser - skipping SDK load.');
+        }
+
+        // ÖNEMLİ: burada Vite'in build-time çözümlemesini engellemek için @vite-ignore comment'ını kullanıyoruz.
+        // Not: runtime'da modül mevcut değilse bu import hata verecektir; bunu yakalıyoruz.
+        // eslint-disable-next-line no-eval
+        const mod = await eval(`import(/* @vite-ignore */ '${pkgName}')`);
         if (!mounted) return;
         setSdk(mod);
         setSdkError(null);
       } catch (err) {
-        console.warn('Farcaster SDK yüklenemedi:', err);
+        console.warn('Farcaster SDK yüklenemedi (runtime):', err);
         if (!mounted) return;
         setSdk(null);
         setSdkError(err?.message || String(err));
@@ -26,7 +38,7 @@ export default function App() {
       }
     }
 
-    loadSdk();
+    loadSdkSafely();
 
     return () => {
       mounted = false;
@@ -36,12 +48,11 @@ export default function App() {
   async function handleDoSomething() {
     if (!sdk) return alert('SDK yüklenmedi.');
     try {
-      // Burayı SDK'nın gerçek metodlarına göre düzenle.
-      if (sdk.createSomething) {
+      if (sdk && typeof sdk.createSomething === 'function') {
         await sdk.createSomething({ example: true });
         alert('İstek gönderildi.');
       } else {
-        alert('SDK yüklendi ama beklenen fonksiyon yok.');
+        alert('SDK yüklendi ama beklenen fonksiyon bulunamadı.');
       }
     } catch (err) {
       console.error('SDK işlem hatası:', err);
@@ -67,8 +78,8 @@ export default function App() {
           <p style={{ color: 'crimson' }}>Farcaster SDK yüklenemedi:</p>
           <pre style={{ whiteSpace: 'pre-wrap' }}>{String(sdkError)}</pre>
           <p>
-            Eğer bu bir build-time (Rollup) hatasıysa, paketin <code>dependencies</code> içinde olduğunu ve
-            <code>npm install</code> sonrası lockfile'ın commit edildiğini kontrol et.
+            Bu geçici çözüm, build sırasında hatayı engeller. Kalıcı çözüm için paketi
+            <code>dependencies</code>'e ekleyip lockfile'ı commit etmelisin.
           </p>
         </div>
       )}
