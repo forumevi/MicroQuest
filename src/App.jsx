@@ -1,35 +1,32 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from "react";
 
 export default function App() {
   const [sdk, setSdk] = useState(null);
   const [sdkError, setSdkError] = useState(null);
   const [loadingSdk, setLoadingSdk] = useState(true);
+  const [account, setAccount] = useState(null);
 
   useEffect(() => {
     let mounted = true;
 
-    async function loadSdkSafely() {
+    async function loadSdk() {
       setLoadingSdk(true);
-
-      // Bu isim runtime'da oluşturuluyor — Vite/Rollup build-time çözümlemeye çalışmaz.
-      const pkgName = '@farcaster/miniapp-sdk';
-
-      // import(/* @vite-ignore */ pkgName) — Vite'e "bu import'u çözme" der.
       try {
-        if (typeof window === 'undefined') {
-          // SSR/build ortamı: SDK'yi deneme
-          throw new Error('Not running in browser - skipping SDK load.');
+        // Dinamik import
+        const mod = await import("@farcaster/miniapp-sdk");
+        if (!mounted) return;
+
+        setSdk(mod);
+
+        // Örnek: Hesap bağlıysa al
+        if (mod.getCurrentAccount) {
+          const acc = await mod.getCurrentAccount();
+          setAccount(acc || null);
         }
 
-        // ÖNEMLİ: burada Vite'in build-time çözümlemesini engellemek için @vite-ignore comment'ını kullanıyoruz.
-        // Not: runtime'da modül mevcut değilse bu import hata verecektir; bunu yakalıyoruz.
-        // eslint-disable-next-line no-eval
-        const mod = await eval(`import(/* @vite-ignore */ '${pkgName}')`);
-        if (!mounted) return;
-        setSdk(mod);
         setSdkError(null);
       } catch (err) {
-        console.warn('Farcaster SDK yüklenemedi (runtime):', err);
+        console.error("Farcaster SDK yüklenemedi:", err);
         if (!mounted) return;
         setSdk(null);
         setSdkError(err?.message || String(err));
@@ -38,30 +35,39 @@ export default function App() {
       }
     }
 
-    loadSdkSafely();
-
+    loadSdk();
     return () => {
       mounted = false;
     };
   }, []);
 
-  async function handleDoSomething() {
-    if (!sdk) return alert('SDK yüklenmedi.');
+  // Hesap bağlama örneği
+  async function connectAccount() {
+    if (!sdk || !sdk.connectAccount) return alert("SDK veya fonksiyon mevcut değil");
     try {
-      if (sdk && typeof sdk.createSomething === 'function') {
-        await sdk.createSomething({ example: true });
-        alert('İstek gönderildi.');
-      } else {
-        alert('SDK yüklendi ama beklenen fonksiyon bulunamadı.');
-      }
+      const acc = await sdk.connectAccount();
+      setAccount(acc);
+      alert("Hesap bağlandı ✅");
     } catch (err) {
-      console.error('SDK işlem hatası:', err);
-      alert('İşlem başarısız: ' + (err?.message || err));
+      console.error("Hesap bağlama hatası:", err);
+      alert("Bağlama başarısız: " + (err?.message || err));
+    }
+  }
+
+  // Örnek SDK işlevi
+  async function doSomethingWithSdk() {
+    if (!sdk || !sdk.createSomething) return alert("SDK veya fonksiyon mevcut değil");
+    try {
+      await sdk.createSomething({ example: true });
+      alert("İstek başarıyla gönderildi ✅");
+    } catch (err) {
+      console.error("SDK işlem hatası:", err);
+      alert("İşlem başarısız: " + (err?.message || err));
     }
   }
 
   return (
-    <div style={{ padding: 24, fontFamily: 'Inter, Roboto, sans-serif' }}>
+    <div style={{ padding: 24, fontFamily: "Inter, Roboto, sans-serif" }}>
       <h1>MicroQuest</h1>
 
       {loadingSdk && <p>Loading Farcaster SDK…</p>}
@@ -69,26 +75,31 @@ export default function App() {
       {!loadingSdk && sdk && (
         <div>
           <p>Farcaster SDK yüklendi ✅</p>
-          <button onClick={handleDoSomething}>Do something with SDK</button>
+
+          {!account && (
+            <button onClick={connectAccount} style={{ marginBottom: 8 }}>
+              Connect Account
+            </button>
+          )}
+
+          {account && (
+            <p>
+              Connected account: <strong>{account?.username || account?.id}</strong>
+            </p>
+          )}
+
+          <button onClick={doSomethingWithSdk}>Do something with SDK</button>
         </div>
       )}
 
       {!loadingSdk && sdkError && (
         <div>
-          <p style={{ color: 'crimson' }}>Farcaster SDK yüklenemedi:</p>
-          <pre style={{ whiteSpace: 'pre-wrap' }}>{String(sdkError)}</pre>
-          <p>
-            Bu geçici çözüm, build sırasında hatayı engeller. Kalıcı çözüm için paketi
-            <code>dependencies</code>'e ekleyip lockfile'ı commit etmelisin.
-          </p>
+          <p style={{ color: "crimson" }}>Farcaster SDK yüklenemedi:</p>
+          <pre style={{ whiteSpace: "pre-wrap" }}>{String(sdkError)}</pre>
         </div>
       )}
 
-      {!loadingSdk && !sdk && !sdkError && (
-        <div>
-          <p>Farcaster SDK mevcut değil — bazı özellikler kapalı olabilir.</p>
-        </div>
-      )}
+      {!loadingSdk && !sdk && !sdkError && <p>Farcaster SDK mevcut değil.</p>}
     </div>
   );
 }
