@@ -1,14 +1,21 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 
-// Vite config (ESM format)
 export default defineConfig({
   plugins: [react()],
+  optimizeDeps: {
+    // Vite'in dev/optimize aşamasında bu paketi zorla çözmesi için
+    include: ['@farcaster/miniapp-sdk']
+  },
+  resolve: {
+    // Gerekirse alias ekleyebilirsin. Genelde boş bırak.
+    // alias: { '@farcaster/miniapp-sdk': '/node_modules/@farcaster/miniapp-sdk/dist/index.mjs' }
+  },
   build: {
     target: 'esnext',
     rollupOptions: {
-      // Farcaster SDK şu an npm’de yok, bu nedenle Vite derleme sırasında yokmuş gibi davranacak
-      external: ['@farcaster/miniapp-sdk'],
-    },
-  },
+      // Genelde external kullanma; önce dependency ekle.
+      // external: []
+    }
+  }
 });
