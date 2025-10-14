@@ -4,18 +4,15 @@ import react from '@vitejs/plugin-react';
 export default defineConfig({
   plugins: [react()],
   optimizeDeps: {
-    // Vite'in dev/optimize aşamasında bu paketi zorla çözmesi için
-    include: ['@farcaster/miniapp-sdk']
+    include: [] // boş bırakıyoruz; dinamik import'u *vite-ignore* ile kontrol edeceğiz
   },
   resolve: {
-    // Gerekirse alias ekleyebilirsin. Genelde boş bırak.
-    // alias: { '@farcaster/miniapp-sdk': '/node_modules/@farcaster/miniapp-sdk/dist/index.mjs' }
+    // alias gerekirse ekle
   },
   build: {
     target: 'esnext',
     rollupOptions: {
-      // Genelde external kullanma; önce dependency ekle.
-      // external: []
+      // bunları boş bırakıyoruz; dışarı alma yerine import'u runtime'a bırakacağız
     }
   }
 });
